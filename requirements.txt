@@ -8,3 +8,4 @@ fastapi
 pillow
 transformers
 python-multipart
+sentencepiece
