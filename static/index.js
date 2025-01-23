@@ -19,6 +19,7 @@ const cardBody = document.querySelector(".card-body");
 cardBody.innerHTML = initialCardBody;
 
 let selectedFile = null;
+let localImageURL = null; // Variable to store the local image URL
 
 // Create a persistent hidden file input for selecting files
 const fileInput = document.createElement("input");
@@ -58,6 +59,8 @@ function initializeEventListeners() {
     if (e.dataTransfer.files.length > 0) {
       selectedFile = e.dataTransfer.files[0];
       dropZone.textContent = `File Selected: ${selectedFile.name}`;
+      // Create a local URL for the image
+      localImageURL = URL.createObjectURL(selectedFile);
     }
   });
 
@@ -84,6 +87,8 @@ function onFileInputChange(e) {
   if (selectedFile) {
     const dropZone = document.getElementById("dropZone");
     dropZone.textContent = `File Selected: ${selectedFile.name}`;
+    // Create a local URL for the image
+    localImageURL = URL.createObjectURL(selectedFile);
   }
   // Reset the file input value to allow selecting the same file again
   fileInput.value = "";
@@ -160,7 +165,7 @@ async function displayResult(fileId) {
 
     const data = await response.json();
     let resultHTML = `
-      <table class="table table-bordered">
+      <table class="table table-bordered flexouilles-table" style="margin-bottom: 0px !important;">
         <thead>
           <tr>
             <th scope="col">Category</th>
@@ -184,9 +189,16 @@ async function displayResult(fileId) {
       </table>
     `;
 
+    document.getElementById("main-card").style.width = "48rem";
+
     cardBody.innerHTML = `
       <h5 id="result-h5" class="card-title text-center">Processing Complete!</h5>
-      <div class="text-center">${resultHTML}</div>
+      <div class="flexouilles">
+        <div class="me-3 flexouilles-img">
+          <img src="${localImageURL}" alt="Uploaded Image" class="up-img">
+        </div>
+        <div class="flexouilles-table">${resultHTML}</div>
+      </div>
       <div class="text-center">
           <button id="resetButton" class="btn btn-secondary mt-3">Reset</button>
       </div>
@@ -205,9 +217,11 @@ async function displayResult(fileId) {
  * Reset card to its initial state
  */
 function resetCard() {
+  document.getElementById("main-card").style.width = "24rem";
   cardBody.innerHTML = initialCardBody;
   updateColors("blue"); // Switch blobs and background to blue
   selectedFile = null;
+  localImageURL = null; // Reset the local image URL
   initializeEventListeners(); // Rebind fresh listeners on new elements
 }
 
